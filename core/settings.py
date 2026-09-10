@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-mv@dz^+sx&6(t34+901v#c0elyz+60%^5)9%-(qy8=u0*bw0#)
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['vektorgo.co', 'www.vektorgo.co', '171.22.131.59']
 
 # Application definition
 
