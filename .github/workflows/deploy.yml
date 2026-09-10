@@ -20,6 +20,6 @@ jobs:
             docker stop my_backend || true
             docker rm my_backend || true
             docker build -t platform-backend .
-            docker run -d -p 80:8000 --env-file .env --name my_backend platform-backend
+            docker run -d -p 127.0.0.1:8000:8000 --env-file .env --name my_backend platform-backend
             docker exec my_backend python manage.py migrate
             docker system prune -f
