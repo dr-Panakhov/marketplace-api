@@ -18,6 +18,8 @@ DEBUG = os.environ.get('DEBUG', 'True') == 'True'
 
 ALLOWED_HOSTS = ['vektorgo.co', 'www.vektorgo.co', '171.22.131.59', '127.0.0.1', 'localhost']
 
+CSRF_TRUSTED_ORIGINS = ['https://vektorgo.co', 'https://www.vektorgo.co']
+
 # Application definition
 INSTALLED_APPS = [
     'django.contrib.admin',
