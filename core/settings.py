@@ -114,7 +114,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 
 # Internationalization
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'ru-ru'
 TIME_ZONE = 'UTC'
 USE_I18N = True
 USE_TZ = True
@@ -143,6 +143,10 @@ DJOSER = {
     'USER_ID_FIELD': 'email',
     'LOGIN_FIELD': 'email',
     'SEND_ACTIVATION_EMAIL': False,
+    'SERIALIZERS': {
+        'user': 'users.serializers.CustomUserSerializer',
+        'current_user': 'users.serializers.CustomUserSerializer',
+    }
 }
 
 CORS_ALLOWED_ORIGINS = [
