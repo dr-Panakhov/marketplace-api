@@ -8,47 +8,42 @@ class AdImageSerializer(serializers.ModelSerializer):
 
 class AdSerializer(serializers.ModelSerializer):
     images = AdImageSerializer(many=True, read_only=True)
-    uploaded_images = serializers.ListField(
-        child=serializers.ImageField(allow_empty_file=False, use_url=False),
-        write_only=True,
-        required=False
-    )
-    # НОВОЕ ПОЛЕ: список ID фоток, которые юзер хочет удалить
-    deleted_images = serializers.ListField(
-        child=serializers.IntegerField(),
-        write_only=True,
-        required=False
-    )
     author = serializers.ReadOnlyField(source='author.email')
 
     class Meta:
         model = Ad
-        # Не забудь добавить deleted_images сюда!
-        fields = ['id', 'title', 'city', 'phone_number', 'description', 'price', 'currency', 'author', 'created_at', 'images', 'uploaded_images', 'deleted_images']
+        # Убрали те самые фейковые поля (uploaded_images, deleted_images)
+        fields = ['id', 'title', 'city', 'phone_number', 'description', 'price', 'currency', 'author', 'created_at', 'images']
 
     def create(self, validated_data):
-        uploaded_images = validated_data.pop('uploaded_images', [])
+        # Достаем сам запрос из контекста
+        request = self.context.get('request')
         ad = Ad.objects.create(**validated_data)
-        for image in uploaded_images:
-            AdImage.objects.create(ad=ad, image=image)
+        
+        # Если юзер прикрепил файлы, жестко вытаскиваем их списком и сохраняем
+        if request and hasattr(request, 'FILES'):
+            for image in request.FILES.getlist('uploaded_images'):
+                AdImage.objects.create(ad=ad, image=image)
+                
         return ad
 
     def update(self, instance, validated_data):
-        uploaded_images = validated_data.pop('uploaded_images', [])
-        deleted_images = validated_data.pop('deleted_images', [])
+        request = self.context.get('request')
         
-        # Обновляем тексты
+        # Обновляем обычные текстовые поля
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
         instance.save()
         
-        # УДАЛЯЕМ ФОТКИ, если юзер нажал крестик на фронте
-        if deleted_images:
-            AdImage.objects.filter(id__in=deleted_images, ad=instance).delete()
+        if request:
+            # Ловим айдишники на удаление (getlist умеет вытаскивать массивы из FormData)
+            deleted_images = request.data.getlist('deleted_images')
+            if deleted_images:
+                AdImage.objects.filter(id__in=deleted_images, ad=instance).delete()
             
-        # Добавляем новые
-        if uploaded_images:
-            for image in uploaded_images:
-                AdImage.objects.create(ad=instance, image=image)
-                
+            # Добавляем новые фотки
+            if hasattr(request, 'FILES'):
+                for image in request.FILES.getlist('uploaded_images'):
+                    AdImage.objects.create(ad=instance, image=image)
+                    
         return instance
