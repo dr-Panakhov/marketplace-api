@@ -12,4 +12,5 @@ class AdSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Ad
-        fields = ['id', 'title', 'city', 'phone_number', 'description', 'price', 'author', 'created_at', 'images']
+        # Не забудь, что тут теперь есть currency!
+        fields = ['id', 'title', 'city', 'phone_number', 'description', 'price', 'currency', 'author', 'created_at', 'images']

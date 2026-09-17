@@ -10,7 +10,7 @@ class Ad(models.Model):
     phone_number = models.CharField(max_length=20)
     description = models.TextField()
     price = models.DecimalField(max_digits=10, decimal_places=2)
-    # Если юзер удалит аккаунт (CASCADE), все его объявления тоже удалятся
+    currency = models.CharField(max_length=3, default='RUB')
     author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='ads')
     created_at = models.DateTimeField(auto_now_add=True)
 
