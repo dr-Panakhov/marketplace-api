@@ -21,11 +21,9 @@ class AdSerializer(serializers.ModelSerializer):
         return f"{obj.author.first_name} {obj.author.last_name}".strip()
 
     def create(self, validated_data):
-        # Достаем сам запрос из контекста
         request = self.context.get('request')
-        ad = Ad.objects.create(**validated_data)
-        
-        # Если юзер прикрепил файлы, жестко вытаскиваем их списком и сохраняем
+        user = request.user if request and request.user.is_authenticated else None
+        ad = Ad.objects.create(author=user, **validated_data)
         if request and hasattr(request, 'FILES'):
             for image in request.FILES.getlist('uploaded_images'):
                 AdImage.objects.create(ad=ad, image=image)
@@ -34,19 +32,14 @@ class AdSerializer(serializers.ModelSerializer):
 
     def update(self, instance, validated_data):
         request = self.context.get('request')
-        
-        # Обновляем обычные текстовые поля
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
         instance.save()
         
         if request:
-            # Ловим айдишники на удаление (getlist умеет вытаскивать массивы из FormData)
             deleted_images = request.data.getlist('deleted_images')
             if deleted_images:
                 AdImage.objects.filter(id__in=deleted_images, ad=instance).delete()
-            
-            # Добавляем новые фотки
             if hasattr(request, 'FILES'):
                 for image in request.FILES.getlist('uploaded_images'):
                     AdImage.objects.create(ad=instance, image=image)
