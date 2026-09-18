@@ -8,12 +8,17 @@ class AdImageSerializer(serializers.ModelSerializer):
 
 class AdSerializer(serializers.ModelSerializer):
     images = AdImageSerializer(many=True, read_only=True)
-    author = serializers.ReadOnlyField(source='author.email')
+    # 1. Убираем старый author и делаем умное поле author_name
+    author_name = serializers.SerializerMethodField()
 
     class Meta:
         model = Ad
-        # Убрали те самые фейковые поля (uploaded_images, deleted_images)
-        fields = ['id', 'title', 'city', 'phone_number', 'description', 'price', 'currency', 'author', 'created_at', 'images']
+        # 2. В fields меняем 'author' на 'author_name'
+        fields = ['id', 'title', 'city', 'phone_number', 'description', 'price', 'currency', 'author_name', 'created_at', 'images']
+
+    # 3. Добавляем метод, который склеивает Имя и Фамилию для фронта
+    def get_author_name(self, obj):
+        return f"{obj.author.first_name} {obj.author.last_name}".strip()
 
     def create(self, validated_data):
         # Достаем сам запрос из контекста
