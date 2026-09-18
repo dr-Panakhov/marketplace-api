@@ -12,6 +12,9 @@ class Ad(models.Model):
     price = models.DecimalField(max_digits=10, decimal_places=2)
     currency = models.CharField(max_length=3, default='RUB')
     author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='ads')
+    
+    favorites = models.ManyToManyField(User, related_name='favorite_ads', blank=True)
+    
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

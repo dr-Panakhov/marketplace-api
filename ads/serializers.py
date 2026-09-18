@@ -11,11 +11,17 @@ class AdSerializer(serializers.ModelSerializer):
     images = AdImageSerializer(many=True, read_only=True)
     author = serializers.SerializerMethodField()
     author_name = serializers.SerializerMethodField()
-
+    is_favorite = serializers.SerializerMethodField()
     class Meta:
         model = Ad
-        fields = ['id', 'title', 'city', 'phone_number', 'description', 'price', 'currency', 'author', 'author_name', 'created_at', 'images']
+        fields = ['id', 'title', 'city', 'phone_number', 'description', 'price', 'currency', 'author', 'author_name', 'created_at', 'images', 'is_favorite']
 
+    def get_is_favorite(self, obj): 
+        request = self.context.get('request')
+        if request and request.user.is_authenticated:
+            return obj.favorites.filter(id=request.user.id).exists()
+        return False
+    
     def _get_author_display_name(self, obj):
         name = ' '.join(
             part.strip()

@@ -19,3 +19,13 @@ class AdViewSet(viewsets.ModelViewSet):
         my_ads = Ad.objects.filter(author=request.user).order_by('-created_at')
         serializer = self.get_serializer(my_ads, many=True)
         return Response(serializer.data)
+
+    @action(detail=True, methods=['post'], permission_classes=[permissions.IsAuthenticated])
+    def favorite(self, request, pk=None):
+        ad = self.get_object()
+        if request.user in ad.favorites.all():
+            ad.favorites.remove(request.user)
+            return Response({'status': 'removed'})
+        else:
+            ad.favorites.add(request.user)
+            return Response({'status': 'added'})
