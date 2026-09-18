@@ -29,3 +29,9 @@ class AdViewSet(viewsets.ModelViewSet):
         else:
             ad.favorites.add(request.user)
             return Response({'status': 'added'})
+
+    @action(detail=False, methods=['get'], permission_classes=[permissions.IsAuthenticated])
+    def my_favorites(self, request):
+        fav_ads = Ad.objects.filter(favorites=request.user).order_by('-created_at')
+        serializer = self.get_serializer(fav_ads, many=True)
+        return Response(serializer.data)
