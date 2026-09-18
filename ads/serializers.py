@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from .models import Ad, AdImage
 
+
 class AdImageSerializer(serializers.ModelSerializer):
     class Meta:
         model = AdImage
@@ -8,22 +9,29 @@ class AdImageSerializer(serializers.ModelSerializer):
 
 class AdSerializer(serializers.ModelSerializer):
     images = AdImageSerializer(many=True, read_only=True)
-    # 1. Убираем старый author и делаем умное поле author_name
     author_name = serializers.SerializerMethodField()
 
     class Meta:
         model = Ad
-        # 2. В fields меняем 'author' на 'author_name'
         fields = ['id', 'title', 'city', 'phone_number', 'description', 'price', 'currency', 'author_name', 'created_at', 'images']
 
-    # 3. Добавляем метод, который склеивает Имя и Фамилию для фронта
     def get_author_name(self, obj):
-        return f"{obj.author.first_name} {obj.author.last_name}".strip()
+        name = ' '.join(
+            part.strip()
+            for part in (obj.author.first_name, obj.author.last_name)
+            if part and part.strip()
+        )
+        return name or 'Продавец'
 
     def create(self, validated_data):
         request = self.context.get('request')
-        user = request.user if request and request.user.is_authenticated else None
-        ad = Ad.objects.create(author=user, **validated_data)
+        author = validated_data.pop('author', None)
+        if author is None and request and request.user.is_authenticated:
+            author = request.user
+        if author is None:
+            raise serializers.ValidationError({'author': 'Автор объявления обязателен.'})
+
+        ad = Ad.objects.create(author=author, **validated_data)
         if request and hasattr(request, 'FILES'):
             for image in request.FILES.getlist('uploaded_images'):
                 AdImage.objects.create(ad=ad, image=image)
