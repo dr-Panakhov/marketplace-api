@@ -26,5 +26,8 @@ jobs:
             if docker exec my_backend python manage.py shell -c "from django.db import connection; raise SystemExit(0 if any(column.name == 'author_id' for column in connection.introspection.get_table_description(connection.cursor(), 'ads_ad')) else 1)"; then
               docker exec my_backend python manage.py migrate ads 0002 --fake
             fi
+            if docker exec my_backend python manage.py shell -c "from django.db import connection; raise SystemExit(0 if any(column.name == 'master_id' for column in connection.introspection.get_table_description(connection.cursor(), 'responses_response')) else 1)"; then
+              docker exec my_backend python manage.py migrate responses 0002 --fake
+            fi
             docker exec my_backend python manage.py migrate
             docker system prune -f
