@@ -11,8 +11,7 @@ urlpatterns = [
     path('api/auth/', include('djoser.urls.jwt')),
 ]
 
-urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-
+# Жестко отдаем медиафайлы через Джанго в любом режиме
 urlpatterns += [
     re_path(r'^media/(?P<path>.*)$', serve, {'document_root': settings.MEDIA_ROOT}),
 ]
