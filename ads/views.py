@@ -5,7 +5,7 @@ from rest_framework.decorators import action # <--- Добавили
 from rest_framework.response import Response   # <--- Добавили
 
 class AdViewSet(viewsets.ModelViewSet):
-    queryset = Ad.objects.all().order_by('-created_at')
+    queryset = Ad.objects.select_related('author').all().order_by('-created_at')
     serializer_class = AdSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
