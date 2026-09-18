@@ -9,19 +9,26 @@ class AdImageSerializer(serializers.ModelSerializer):
 
 class AdSerializer(serializers.ModelSerializer):
     images = AdImageSerializer(many=True, read_only=True)
+    author = serializers.SerializerMethodField()
     author_name = serializers.SerializerMethodField()
 
     class Meta:
         model = Ad
-        fields = ['id', 'title', 'city', 'phone_number', 'description', 'price', 'currency', 'author_name', 'created_at', 'images']
+        fields = ['id', 'title', 'city', 'phone_number', 'description', 'price', 'currency', 'author', 'author_name', 'created_at', 'images']
 
-    def get_author_name(self, obj):
+    def _get_author_display_name(self, obj):
         name = ' '.join(
             part.strip()
             for part in (obj.author.first_name, obj.author.last_name)
             if part and part.strip()
         )
         return name or 'Продавец'
+
+    def get_author(self, obj):
+        return self._get_author_display_name(obj)
+
+    def get_author_name(self, obj):
+        return self._get_author_display_name(obj)
 
     def create(self, validated_data):
         request = self.context.get('request')

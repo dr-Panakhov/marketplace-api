@@ -30,8 +30,13 @@ class AdSerializerTests(TestCase):
     def test_author_name_is_available_for_ad_list_and_detail_serialization(self):
         ad = Ad.objects.create(author=self.user, **self.ad_data)
 
-        self.assertEqual(AdSerializer(ad).data['author_name'], 'Иван Петров')
-        self.assertEqual(AdSerializer(Ad.objects.get(pk=ad.pk)).data['author_name'], 'Иван Петров')
+        serialized_ad = AdSerializer(ad).data
+        serialized_detail = AdSerializer(Ad.objects.get(pk=ad.pk)).data
+
+        self.assertEqual(serialized_ad['author'], 'Иван Петров')
+        self.assertEqual(serialized_ad['author_name'], 'Иван Петров')
+        self.assertEqual(serialized_detail['author'], 'Иван Петров')
+        self.assertEqual(serialized_detail['author_name'], 'Иван Петров')
 
     def test_create_uses_author_passed_by_view(self):
         serializer = AdSerializer(data=self.ad_data)
