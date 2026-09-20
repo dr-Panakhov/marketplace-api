@@ -2,8 +2,8 @@ from rest_framework import viewsets, permissions
 from rest_framework.parsers import JSONParser, FormParser, MultiPartParser
 from .models import Ad
 from .serializers import AdSerializer
-from rest_framework.decorators import action # <--- Добавили
-from rest_framework.response import Response   # <--- Добавили
+from rest_framework.decorators import action
+from rest_framework.response import Response
 
 class AdViewSet(viewsets.ModelViewSet):
     queryset = Ad.objects.select_related('author').all().order_by('-created_at')
@@ -34,4 +34,10 @@ class AdViewSet(viewsets.ModelViewSet):
     def my_favorites(self, request):
         fav_ads = Ad.objects.filter(favorites=request.user).order_by('-created_at')
         serializer = self.get_serializer(fav_ads, many=True)
+        return Response(serializer.data)
+
+    @action(detail=False, methods=['get'], url_path=r'user/(?P<user_id>\d+)')
+    def user_ads(self, request, user_id=None):
+        master_ads = Ad.objects.filter(author_id=user_id).order_by('-created_at')
+        serializer = self.get_serializer(master_ads, many=True)
         return Response(serializer.data)
