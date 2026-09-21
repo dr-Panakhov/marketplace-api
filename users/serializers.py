@@ -30,3 +30,8 @@ class ReviewSerializer(serializers.ModelSerializer):
         model = Review
         fields = ['id', 'author', 'author_name', 'seller', 'text', 'rating', 'created_at']
         read_only_fields = ['author']
+    def validate(self, data):
+        request = self.context.get('request')
+        if request and request.user == data.get('seller'):
+            raise serializers.ValidationError("Нельзя оставлять отзыв самому себе.")
+        return data
