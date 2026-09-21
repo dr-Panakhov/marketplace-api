@@ -1,5 +1,7 @@
 from djoser.serializers import UserSerializer, UserCreateSerializer
 from django.contrib.auth import get_user_model
+from rest_framework import serializers
+from .models import Review
 
 User = get_user_model()
 
@@ -19,5 +21,12 @@ class CustomUserCreateSerializer(UserCreateSerializer):
 class CustomUserSerializer(UserSerializer):
     class Meta(UserSerializer.Meta):
         model = User
-        # Добавили first_name и last_name, вываливаем всё добро
         fields = ('id', 'email', 'first_name', 'last_name', 'role', 'phone_number', 'avatar', 'patronymic')
+
+class ReviewSerializer(serializers.ModelSerializer):
+    author_name = serializers.CharField(source='author.first_name', read_only=True) 
+
+    class Meta:
+        model = Review
+        fields = ['id', 'author', 'author_name', 'seller', 'text', 'rating', 'created_at']
+        read_only_fields = ['author']

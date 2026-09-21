@@ -1,5 +1,6 @@
 from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.db import models
+from django.core.validators import MinValueValidator, MaxValueValidator
 
 class CustomUserManager(BaseUserManager):
     def create_user(self, email, password=None, **extra_fields):
@@ -25,22 +26,32 @@ class User(AbstractUser):
     username = None 
     email = models.EmailField(unique=True)
     
-    # Делаем обязательными на уровне БД
     first_name = models.CharField(max_length=150)
     last_name = models.CharField(max_length=150)
     phone_number = models.CharField(max_length=20) 
     
-    # Необязательные поля
     patronymic = models.CharField(max_length=150, blank=True, null=True)
     avatar = models.ImageField(upload_to='avatars/', blank=True, null=True)
     
     role = models.CharField(max_length=20, choices=ROLE_CHOICES, default='customer')
 
     USERNAME_FIELD = 'email'
-    # Чтобы Джанго точно знал, что эти поля нужны всегда
     REQUIRED_FIELDS = ['first_name', 'last_name', 'phone_number']
 
     objects = CustomUserManager()
 
     def __str__(self):
         return f"{self.first_name} {self.last_name} ({self.email})"
+
+class Review(models.Model):
+    author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='left_reviews')
+    seller = models.ForeignKey(User, on_delete=models.CASCADE, related_name='received_reviews')
+    text = models.TextField('Текст отзыва')
+    rating = models.IntegerField('Оценка', validators=[MinValueValidator(1), MaxValueValidator(5)])
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('author', 'seller') 
+
+    def __str__(self):
+        return f"Отзыв от {self.author} для {self.seller}"

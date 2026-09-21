@@ -3,11 +3,11 @@ from .models import Ad, AdImage
 
 class AdImageInline(admin.TabularInline):
     model = AdImage
-    extra = 1  # Сколько пустых слотов для фоток показывать по умолчанию
+    extra = 1
 
 @admin.register(Ad)
 class AdAdmin(admin.ModelAdmin):
-    list_display = ('title', 'city', 'price', 'author', 'created_at') # Колонки в общем списке
-    list_filter = ('city',) # Боковая панель фильтрации
-    search_fields = ('title', 'description') # Поиск по тексту
-    inlines = [AdImageInline]  # Подключаем галерею внутрь объявления
+    list_display = ('title', 'city', 'price', 'author', 'created_at')
+    list_filter = ('city',)
+    search_fields = ('title', 'description')
+    inlines = [AdImageInline]

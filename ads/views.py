@@ -15,7 +15,6 @@ class AdViewSet(viewsets.ModelViewSet):
         serializer.save(author=self.request.user)
     @action(detail=False, methods=['get'], permission_classes=[permissions.IsAuthenticated])
     def me(self, request):
-        # Достаем объявы только того юзера, который делает запрос
         my_ads = Ad.objects.filter(author=request.user).order_by('-created_at')
         serializer = self.get_serializer(my_ads, many=True)
         return Response(serializer.data)

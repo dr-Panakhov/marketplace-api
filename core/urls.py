@@ -7,11 +7,11 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include('ads.urls')),
     path('api/', include('responses.urls')),
+    path('api/', include('users.urls')),
     path('api/auth/', include('djoser.urls')),
     path('api/auth/', include('djoser.urls.jwt')),
 ]
 
-# Жестко отдаем медиафайлы через Джанго в любом режиме
 urlpatterns += [
     re_path(r'^media/(?P<path>.*)$', serve, {'document_root': settings.MEDIA_ROOT}),
 ]
