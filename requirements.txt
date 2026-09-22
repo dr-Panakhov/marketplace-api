@@ -29,3 +29,6 @@ sqlparse==0.6.0
 urllib3==2.7.0
 psycopg2-binary>=2.9.9
 django-cors-headers
+channels
+daphne
+channels-redis

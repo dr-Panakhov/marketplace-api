@@ -17,6 +17,8 @@ ALLOWED_HOSTS = ['vektorgo.co', 'www.vektorgo.co', '171.22.131.59', '127.0.0.1',
 CSRF_TRUSTED_ORIGINS = ['https://vektorgo.co', 'https://www.vektorgo.co']
 
 INSTALLED_APPS = [
+    'daphne',
+    'channels',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -27,6 +29,7 @@ INSTALLED_APPS = [
     'djoser',
     'users.apps.UsersConfig',
     'ads.apps.AdsConfig',
+    'chat',
     'responses.apps.ResponsesConfig',
     'corsheaders',
 ]
@@ -59,7 +62,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'core.wsgi.application'
+ASGI_APPLICATION = 'core.asgi.application'
 
 
 DB_NAME = os.environ.get('POSTGRES_DB')
@@ -86,6 +89,16 @@ else:
             'NAME': BASE_DIR / 'db.sqlite3',
         }
     }
+
+
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            "hosts": [('172.17.0.1', 6379)],
+        },
+    },
+}
 
 
 AUTH_PASSWORD_VALIDATORS = [
