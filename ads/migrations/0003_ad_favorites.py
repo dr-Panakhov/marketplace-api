@@ -12,9 +12,14 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.AddField(
-            model_name='ad',
-            name='favorites',
-            field=models.ManyToManyField(blank=True, related_name='favorite_ads', to=settings.AUTH_USER_MODEL),
-        ),
+        migrations.SeparateDatabaseAndState(
+            state_operations=[
+                migrations.AddField(
+                    model_name='ad',
+                    name='favorites',
+                    field=models.ManyToManyField(blank=True, related_name='favorite_ads', to=settings.AUTH_USER_MODEL),
+                ),
+            ],
+            database_operations=[],
+        )
     ]
